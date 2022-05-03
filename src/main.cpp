@@ -79,7 +79,7 @@ void demo_paned(const ImGuiIO &io, PadStatus *pad_status, bool use_pixel_offset)
     ImGui::SetNextWindowPos(ImVec2(0, 0));
     ImGui::SetNextWindowSize(io.DisplaySize);
     ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, ImVec2(0, 10));
-    ImGui::Begin("PS2 + ImGui", NULL,
+    ImGui::Begin("psp + ImGui", NULL,
                  ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove);
     {
         // PushStyleVar in previous lines was used to increase the title-bar height
@@ -120,7 +120,7 @@ void demo_paned(const ImGuiIO &io, PadStatus *pad_status, bool use_pixel_offset)
             {
                 if (selected_content == 0) {
                     // Introduction section
-                    ImGui::TextColored(ImVec4(0.4, 0.6, 1.0, 1.0), "Welcome to the PS2 ImGui demo!");
+                    ImGui::TextColored(ImVec4(0.4, 0.6, 1.0, 1.0), "Welcome to the psp ImGui demo!");
                     ImGui::Separator();
 
                     ImGui::Text("Press");
@@ -194,7 +194,7 @@ void demo_windowed(const ImGuiIO &io, PadStatus *pad_status, bool use_pixel_offs
     ImGui::SetNextWindowPos(ImVec2(spacing, spacing), ImGuiCond_FirstUseEver);
     ImGui::SetNextWindowSize(ImVec2(io.DisplaySize.x / 2 - 1.5 * spacing, io.DisplaySize.y / 2 - 1.5 * spacing),
                              ImGuiCond_FirstUseEver);
-    ImGui::Begin("PS2 + ImGui (Windowed)", NULL, ImGuiWindowFlags_NoCollapse);
+    ImGui::Begin("psp + ImGui (Windowed)", NULL, ImGuiWindowFlags_NoCollapse);
     {
         ImGui::SetWindowFontScale(0.9f);
         ImGui::Text("Press");

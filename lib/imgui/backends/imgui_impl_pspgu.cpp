@@ -1,5 +1,5 @@
-// dear imgui: Renderer Backend for PS2 gsKit
-// This needs to be used along with the PS2SDK backend
+// dear imgui: Renderer Backend for psp gsKit
+// This needs to be used along with the pspSDK backend
 
 // You can use unmodified imgui_impl_* files in your project. See examples/ folder for examples of using this. 
 // Prefer including the entire imgui/ repository into your project (either as a copy or as a submodule), and only build the backends you need.
@@ -7,9 +7,9 @@
 // Read online: https://github.com/ocornut/imgui/tree/master/docs
 
 #include "imgui.h"
-#include "imgui_impl_ps2gskit.h"
+#include "imgui_impl_pspgu.h"
 
-// TODO: ps2sdk and gsKit includes
+// TODO: pspsdk and gsKit includes
 #include <malloc.h>
 #include <tamtypes.h>
 #include <gsKit.h>
@@ -22,31 +22,31 @@ const u64 Green = GS_SETREG_RGBAQ(0x00,0x80,0x00,0x80,0x00);
 const u64 Blue = GS_SETREG_RGBAQ(0x00,0x00,0x80,0x80,0x00);
 
 
-struct ImGui_ImplPs2GsKit_Data
+struct ImGui_Implpspgu_Data
 {
     GSGLOBAL *Global;
     GSTEXTURE *FontTexture;
 
-    ImGui_ImplPs2GsKit_Data() { memset(this, 0, sizeof(*this)); }
+    ImGui_Implpspgu_Data() { memset(this, 0, sizeof(*this)); }
 };
 
 // Backend data stored in io.BackendRendererUserData to allow support for multiple Dear ImGui contexts
 // It is STRONGLY preferred that you use docking branch with multi-viewports (== single Dear ImGui context + multiple windows) instead of multiple Dear ImGui contexts.
-static ImGui_ImplPs2GsKit_Data* ImGui_ImplPs2GsKit_GetBackendData()
+static ImGui_Implpspgu_Data* ImGui_Implpspgu_GetBackendData()
 {
-    return ImGui::GetCurrentContext() ? (ImGui_ImplPs2GsKit_Data*)ImGui::GetIO().BackendRendererUserData : NULL;
+    return ImGui::GetCurrentContext() ? (ImGui_Implpspgu_Data*)ImGui::GetIO().BackendRendererUserData : NULL;
 }
 
 // Functions
-bool ImGui_ImplPs2GsKit_Init(GSGLOBAL *global)
+bool ImGui_Implpspgu_Init(GSGLOBAL *global)
 {
     ImGuiIO& io = ImGui::GetIO();
     IM_ASSERT(io.BackendRendererUserData == NULL && "Already initialized a renderer backend!");
 
     // Setup backend capabilities flags
-    ImGui_ImplPs2GsKit_Data* bd = IM_NEW(ImGui_ImplPs2GsKit_Data)();
+    ImGui_Implpspgu_Data* bd = IM_NEW(ImGui_Implpspgu_Data)();
     io.BackendRendererUserData = (void*)bd;
-    io.BackendRendererName = "imgui_impl_ps2gskit";
+    io.BackendRendererName = "imgui_impl_pspgu";
     io.BackendFlags |= ImGuiBackendFlags_RendererHasVtxOffset;
     io.MouseDrawCursor = true;
     bd->Global = global;
@@ -57,34 +57,34 @@ bool ImGui_ImplPs2GsKit_Init(GSGLOBAL *global)
     return true;
 }
 
-void ImGui_ImplPs2GsKit_Shutdown()
+void ImGui_Implpspgu_Shutdown()
 {
-    ImGui_ImplPs2GsKit_Data* bd = ImGui_ImplPs2GsKit_GetBackendData();
+    ImGui_Implpspgu_Data* bd = ImGui_Implpspgu_GetBackendData();
     IM_ASSERT(bd != NULL && "No renderer backend to shutdown, or already shutdown?");
     ImGuiIO& io = ImGui::GetIO();
 
-    ImGui_ImplPs2GsKit_DestroyDeviceObjects();
+    ImGui_Implpspgu_DestroyDeviceObjects();
     io.BackendRendererName = NULL;
     io.BackendRendererUserData = NULL;
     IM_DELETE(bd);
 }
 
-void ImGui_ImplPs2GsKit_NewFrame()
+void ImGui_Implpspgu_NewFrame()
 {
-    ImGui_ImplPs2GsKit_Data* bd = ImGui_ImplPs2GsKit_GetBackendData();
-    IM_ASSERT(bd != NULL && "Did you call ImGui_ImplPs2GsKit_Init()?");
+    ImGui_Implpspgu_Data* bd = ImGui_Implpspgu_GetBackendData();
+    IM_ASSERT(bd != NULL && "Did you call ImGui_Implpspgu_Init()?");
 
     if (!bd->FontTexture) {
-        ImGui_ImplPs2GsKit_CreateDeviceObjects();
+        ImGui_Implpspgu_CreateDeviceObjects();
     }
 }
 
-static void ImGui_ImplPs2GsKit_SetupRenderState(GSGLOBAL *global, ImDrawData* draw_data)
+static void ImGui_Implpspgu_SetupRenderState(GSGLOBAL *global, ImDrawData* draw_data)
 {   
     gsKit_set_test(global, GS_ZTEST_OFF);
 }
 
-static u64 ImGui_ImplPs2GsKit_NormalizeImColor(ImU32 color)
+static u64 ImGui_Implpspgu_NormalizeImColor(ImU32 color)
 {
     u8 r = (color >> IM_COL32_R_SHIFT) & 0xFF;
     u8 g = (color >> IM_COL32_G_SHIFT) & 0xFF;
@@ -97,13 +97,13 @@ static u64 ImGui_ImplPs2GsKit_NormalizeImColor(ImU32 color)
     return GS_SETREG_RGBA(r >> 1, g >> 1, b >> 1, a >> 2);
 }
 
-void ImGui_ImplPs2GsKit_RenderDrawData(ImDrawData* draw_data, ImVec2 pixelOffset)
+void ImGui_Implpspgu_RenderDrawData(ImDrawData* draw_data, ImVec2 pixelOffset)
 {
-    ImGui_ImplPs2GsKit_Data* bd = ImGui_ImplPs2GsKit_GetBackendData();
-    IM_ASSERT(bd != NULL && "Did you call ImGui_ImplPs2GsKit_Init()?");
+    ImGui_Implpspgu_Data* bd = ImGui_Implpspgu_GetBackendData();
+    IM_ASSERT(bd != NULL && "Did you call ImGui_Implpspgu_Init()?");
 
     // Setup desired render state
-    ImGui_ImplPs2GsKit_SetupRenderState(bd->Global, draw_data);
+    ImGui_Implpspgu_SetupRenderState(bd->Global, draw_data);
     
     // Will project scissor/clipping rectangles into framebuffer space
     ImVec2 clip_off = draw_data->DisplayPos;         // (0,0) unless using multi-viewports
@@ -125,7 +125,7 @@ void ImGui_ImplPs2GsKit_RenderDrawData(ImDrawData* draw_data, ImVec2 pixelOffset
                 // User callback, registered via ImDrawList::AddCallback()
                 // (ImDrawCallback_ResetRenderState is a special callback value used by the user to request the renderer to reset render state.)
                 if (pcmd->UserCallback == ImDrawCallback_ResetRenderState)
-                    ImGui_ImplPs2GsKit_SetupRenderState(bd->Global, draw_data);
+                    ImGui_Implpspgu_SetupRenderState(bd->Global, draw_data);
                 else
                     pcmd->UserCallback(cmd_list, pcmd);
             }
@@ -154,9 +154,9 @@ void ImGui_ImplPs2GsKit_RenderDrawData(ImDrawData* draw_data, ImVec2 pixelOffset
                         vtx2.pos.x + pixelOffset.x, vtx2.pos.y + pixelOffset.y, vtx2.uv.x * texture->Width, vtx2.uv.y * texture->Height,
                         vtx3.pos.x + pixelOffset.x, vtx3.pos.y + pixelOffset.y, vtx3.uv.x * texture->Width, vtx3.uv.y * texture->Height,
                         20,
-                        ImGui_ImplPs2GsKit_NormalizeImColor(vtx1.col), 
-                        ImGui_ImplPs2GsKit_NormalizeImColor(vtx2.col), 
-                        ImGui_ImplPs2GsKit_NormalizeImColor(vtx3.col));
+                        ImGui_Implpspgu_NormalizeImColor(vtx1.col), 
+                        ImGui_Implpspgu_NormalizeImColor(vtx2.col), 
+                        ImGui_Implpspgu_NormalizeImColor(vtx3.col));
                 }
             }
         }
@@ -188,11 +188,11 @@ int gsKit_texture2_finish(GSGLOBAL *gsGlobal, GSTEXTURE *Texture) {
     return 0;
 }
 
-bool ImGui_ImplPs2GsKit_CreateFontsTexture()
+bool ImGui_Implpspgu_CreateFontsTexture()
 {
     // Build texture atlas
     ImGuiIO& io = ImGui::GetIO();
-    ImGui_ImplPs2GsKit_Data* bd = ImGui_ImplPs2GsKit_GetBackendData();
+    ImGui_Implpspgu_Data* bd = ImGui_Implpspgu_GetBackendData();
     unsigned char* pixels;
     int width, height, bpp;
     io.Fonts->GetTexDataAsRGBA32(&pixels, &width, &height, &bpp);   // Load as RGBA 32-bit (75% of the memory is wasted, but default font is so small) because it is more likely to be compatible with user's existing shaders.
@@ -219,10 +219,10 @@ bool ImGui_ImplPs2GsKit_CreateFontsTexture()
     return true;
 }
 
-void ImGui_ImplPs2GsKit_DestroyFontsTexture()
+void ImGui_Implpspgu_DestroyFontsTexture()
 {
     ImGuiIO& io = ImGui::GetIO();
-    ImGui_ImplPs2GsKit_Data* bd = ImGui_ImplPs2GsKit_GetBackendData();
+    ImGui_Implpspgu_Data* bd = ImGui_Implpspgu_GetBackendData();
     if (bd->FontTexture)
     {
         // TODO: use gsKit to delete the font texture
@@ -232,12 +232,12 @@ void ImGui_ImplPs2GsKit_DestroyFontsTexture()
     }
 }
 
-bool    ImGui_ImplPs2GsKit_CreateDeviceObjects()
+bool    ImGui_Implpspgu_CreateDeviceObjects()
 {
-    return ImGui_ImplPs2GsKit_CreateFontsTexture();
+    return ImGui_Implpspgu_CreateFontsTexture();
 }
 
-void    ImGui_ImplPs2GsKit_DestroyDeviceObjects()
+void    ImGui_Implpspgu_DestroyDeviceObjects()
 {
-    ImGui_ImplPs2GsKit_DestroyFontsTexture();
+    ImGui_Implpspgu_DestroyFontsTexture();
 }

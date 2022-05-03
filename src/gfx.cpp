@@ -1,15 +1,15 @@
 #include "gfx.h"
 
 #include <imgui.h>
-#include <imgui_impl_ps2sdk.h>
-#include <imgui_impl_ps2gskit.h>
+#include <imgui_impl_pspsdk.h>
+#include <imgui_impl_pspgu.h>
 
 #include "custom_font.h"
 #include "drawing/drawing.h"
 #include "widgets/widget.h"
 
 GSGLOBAL *gfx_init(bool hires, bool textureManager) {
-    // TODO: Can't get hires to work on my PS2 :(
+    // TODO: Can't get hires to work on my psp :(
     GSGLOBAL *gsGlobal;
     int hiresPassCount;
 
@@ -88,8 +88,8 @@ void gfx_imgui_init(GSGLOBAL *gsGlobal) {
     style.SelectableTextAlign = ImVec2(0, 0.5);
 
     // Setup ImGui backends
-    ImGui_ImplPs2Sdk_InitForGsKit(gsGlobal);
-    ImGui_ImplPs2GsKit_Init(gsGlobal);
+    ImGui_ImplpspSdk_InitForGsKit(gsGlobal);
+    ImGui_Implpspgu_Init(gsGlobal);
 }
 
 void gfx_render_clear(GSGLOBAL *gsGlobal, u64 color) {
@@ -100,8 +100,8 @@ void gfx_render_clear(GSGLOBAL *gsGlobal, u64 color) {
 
 void gfx_render_begin(GSGLOBAL *gsGlobal, bool hires, bool textureManager) {
     // Start the Dear ImGui frame
-    ImGui_ImplPs2Sdk_NewFrame();
-    ImGui_ImplPs2GsKit_NewFrame();
+    ImGui_ImplpspSdk_NewFrame();
+    ImGui_Implpspgu_NewFrame();
     ImGui::NewFrame();
 }
 
@@ -112,7 +112,7 @@ void gfx_render_end(GSGLOBAL *gsGlobal, bool hires, bool textureManager, bool pi
     ImGui::Widgets::MouseCursor();
     ImGui::Render();
 
-    ImGui_ImplPs2GsKit_RenderDrawData(ImGui::GetDrawData(), pixelOffset ? ImVec2(-0.5f, -0.5f) : ImVec2(0, 0));
+    ImGui_Implpspgu_RenderDrawData(ImGui::GetDrawData(), pixelOffset ? ImVec2(-0.5f, -0.5f) : ImVec2(0, 0));
 
     if (hires) {
         gsKit_hires_sync(gsGlobal);
